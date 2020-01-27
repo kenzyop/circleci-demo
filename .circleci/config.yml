@@ -1,14 +1,29 @@
 version: 2.1
 
 jobs:
-  docker:
-    - image: circleci/python:3.8
   my_first_job:
+    docker:
+      - image: circleci/python:3.8
     steps:
       - run:
-          command: echo "test"
+          command: echo "test" > test.txt
+      - persist_to_workspace:
+          - root: .
+            - paths:
+                - - test.txt
+
+  my_second_job:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: /tmp/workspace
+    steps:
+      - attach_to_workspace:
+          - at: /tmp/workspace
+      - run:
+          command: cat test.txt
 
 workflows:
   test_workflows:
     jobs:
       - my_first_job
+      - my_second_job
